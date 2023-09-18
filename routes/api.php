@@ -10,6 +10,7 @@ use App\Http\Controllers\VehicleOutController;
 use App\Http\Controllers\QrCodeController;
 use App\Http\Controllers\ManageVehicaleController;
 use App\Http\Controllers\ResidentController;
+use App\Http\Controllers\VisitorController;
 
 //User controller
 Route::post('/register', [UserController::class, 'register']);
@@ -19,7 +20,7 @@ Route::post('/generate-qr-code', 'QrCodeController@generateQRCode');
 //CategoryController
 Route::post('/createCategory', [CategoryController::class, 'store']);
 
-Route::middleware(['auth:sanctum'])->group(function () {
+Route::middleware(['auth:sanctum', 'logApiRequests'])->group(function () {
 
     //User controller
     Route::get('/users-list', [UserController::class,'index']);
@@ -50,4 +51,10 @@ Route::middleware(['auth:sanctum'])->group(function () {
    //QrCodeController
    Route::get('/getqrdetails', [QrCodeController::class,'show']);
    Route::get('/checkVehicaldata/{uuid}', [QrCodeController::class,'getVehicleData']);
+
+   //VisitorController
+   Route::post('/check-in-visitor', [VisitorController::class, 'store']);
+   Route::get('/show-visitor', [VisitorController::class,'showVisitor']);
+   Route::get('/check-out-visitor/{token_no}', [VisitorController::class,'checkOutVisitor']);
+
 });

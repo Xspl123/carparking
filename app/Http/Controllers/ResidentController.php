@@ -18,7 +18,7 @@ class ResidentController extends Controller
     public function index()
     {
         // Find the resident and associated vehicle
-        $resident = Resident::with('vehicle')->latest()->get();
+        $resident = Resident::with('vehicle')->latest()->limit(50)->get();
 
         // Return a JSON response with the resident and vehicle data
         return response()->json([

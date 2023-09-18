@@ -4,27 +4,49 @@ namespace App\Http\Controllers;
 use App\Http\Requests\VisitorRequest;
 use App\Models\Visitor;
 use Illuminate\Http\Request;
+use App\Http\Resources\VisitorResource;
+use Carbon\Carbon;
+
 
 class VisitorController extends Controller
 {
     public function store(VisitorRequest $request)
     {
-        // Validate the incoming request data
         $validatedData = $request->validated();
-
-        // Handle image upload
         if ($request->hasFile('photo')) {
-            $imagePath = $request->file('photo')->store('uploads', 'public'); // Store the image in the 'public/uploads' directory
-
-            // Save the image path in the 'photo_path' field of the Visitor model
+            $imagePath = $request->file('photo')->store('uploads', 'public');  
             $validatedData['photo_path'] = $imagePath;
         }
-
-        // Create a new visitor record
         $visitor = new Visitor($validatedData);
-        $visitor->save();
 
-        // Return a JSON response indicating success
+            $visitor->resident_id = $validatedData['resident_id'];
+            $visitor->token_no = str_pad(mt_rand(1, 999999), 6, '0', STR_PAD_LEFT);
+
+            $visitor->save();
+
         return response()->json(['message' => 'Visitor added successfully'], 201);
     }
+
+    public function showVisitor(){
+
+        $visitors = Visitor::latest()->with('resident')->get();
+        return VisitorResource::collection($visitors);
+    }
+
+    public function checkOutVisitor($token_no)
+    {
+        $visitors = Visitor::where('token_no', $token_no)->get();
+
+        $checkoutTime = Carbon::now('Asia/Kolkata');
+
+        foreach ($visitors as $visitor) {
+            $visitor->update([
+            'status' => 'out',
+            'check_out_time' => $checkoutTime,
+        ]);
+        }
+
+        return response()->json(['message' => 'Visitors checked out successfully'], 200);
+    }
+
 }

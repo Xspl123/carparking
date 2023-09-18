@@ -30,6 +30,11 @@ class Visitor extends Model
         'badge_pass_number',
         'host_id',
         'visitor_type',
+        'vehicle_number'
        
     ];
+    public function resident()
+    {
+        return $this->belongsTo(Resident::class);
+    }
 }

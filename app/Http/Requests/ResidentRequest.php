@@ -16,7 +16,7 @@ class ResidentRequest extends FormRequest
         return [
             'name' => 'required|string|max:255',
             'flat_number' => 'required|string|max:255',
-            'phone' => 'nullable|string|max:255',
+            'phone' => 'required',
             'email' => 'nullable|email|max:255',
         ];
     }

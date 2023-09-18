@@ -48,7 +48,7 @@ class ManageVehicaleController extends Controller
     public function showVehiclesStatus()
     {
         $vehicles = ManageVehicale::with('vehicle','resident')
-            ->latest('created_at')
+            ->latest('created_at')->limit(50)
             ->get();
 
         return response()->json(['vehiclesInOut' => $vehicles], 200);
@@ -58,10 +58,9 @@ class ManageVehicaleController extends Controller
     public function singleVehiclesStatus($id)
     {
         try {
-            $vehicle = ManageVehicale::findOrFail($id);
+            $vehicle = ManageVehicale::with('vehicle:id,vehicle_name,plat_number,parking_number,registration_number','resident:id,name,flat_number')->findOrFail($id);
             return response()->json(['data' => $vehicle], 200);
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-            return response()->json(['message' => 'Vehicle not found'], 404);
         }
     }
 

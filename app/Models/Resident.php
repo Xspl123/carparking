@@ -19,4 +19,9 @@ class Resident extends Model
         return $this->hasOne(QrCode::class, 'resident_id');
     }
 
+    public function visitor()
+    {
+        return $this->hasOne(Visitor::class, 'resident_id');
+    }
+
 }
