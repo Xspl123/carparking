@@ -13,12 +13,13 @@ use App\Http\Controllers\ResidentController;
 use App\Http\Controllers\VisitorController;
 
 //User controller
+Route::middleware(['logApiRequests'])->group(function () {
 Route::post('/register', [UserController::class, 'register']);
 Route::post('/login', [UserController::class, 'login']);
 Route::post('/generate-qr-code', 'QrCodeController@generateQRCode');
-
 //CategoryController
 Route::post('/createCategory', [CategoryController::class, 'store']);
+});
 
 Route::middleware(['auth:sanctum', 'logApiRequests'])->group(function () {
 

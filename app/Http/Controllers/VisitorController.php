@@ -11,7 +11,7 @@ use Carbon\Carbon;
 class VisitorController extends Controller
 {
     public function store(VisitorRequest $request)
-    {
+    {  
         $validatedData = $request->validated();
         if ($request->hasFile('photo')) {
             $imagePath = $request->file('photo')->store('uploads', 'public');  

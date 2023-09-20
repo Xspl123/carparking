@@ -11,18 +11,21 @@ use App\Http\Requests\ResidentRequest;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
+use Symfony\Component\Mime\Encoder\Base64Encoder;
 
 class ResidentController extends Controller
-{
-   
+{  
     public function index()
     {
-        // Find the resident and associated vehicle
-        $resident = Resident::with('vehicle')->latest()->limit(50)->get();
+        $perPage = 20; // Number of residents per page
 
-        // Return a JSON response with the resident and vehicle data
+        $residents = Resident::with('vehicle')
+            ->latest()
+            ->limit(50) // Limit the total number of residents to 50
+            ->paginate($perPage);
+
         return response()->json([
-            'resident' => $resident,
+            'residents' => $residents,
         ], 200);
     }
 
@@ -44,10 +47,19 @@ class ResidentController extends Controller
             $residentData = $residentRequest->validated();
             $vehicleData = $vehicleRequest->validated();
             $registrationNumber = mt_rand(10000000000000, 99999999999999);
-            $createdByUserId = auth()->user()->id;
+            // Convert the number to binary
+               $binaryData = pack('Q', $registrationNumber);
+
+            // Encode the binary data to Base64
+               $base64Encoded = base64_encode($binaryData);
+
+                // Remove padding characters if necessary
+                $base64Encoded = rtrim($base64Encoded, '=');
+
+                $createdByUserId = auth()->user()->id;
 
             // Start a database transaction
-            DB::transaction(function () use ($residentData, $vehicleData, $registrationNumber, $createdByUserId) {
+            DB::transaction(function () use ($residentData, $vehicleData, $registrationNumber,$base64Encoded, $createdByUserId) {
                 // Create a new resident record
                 $resident = new Resident();
                 $resident->name = $residentData['name'];
@@ -59,13 +71,13 @@ class ResidentController extends Controller
                 $resident->save();
 
                 // Generate a QR code
-                $qrCode = QrCode::format('png')->size(200)->generate($registrationNumber);
-                $qrCodePath = public_path("qr_codes/{$resident->flat_number}.png");
+                $qrCode = QrCode::format('svg')->size(400)->generate($base64Encoded);
+                $qrCodePath = public_path("qr_codes/{$resident->flat_number}.svg");
                 file_put_contents($qrCodePath, $qrCode);
 
                 // Generate the URL for the QR code
                 $baseUrl = config('app.url'); // Get your application's base URL from the config
-                $qrCodeUrl = "{$baseUrl}/public/qr_codes/{$resident->flat_number}.png";
+                $qrCodeUrl = "{$baseUrl}/public/qr_codes/{$resident->flat_number}.svg";
 
                 // Save the QR code to the qrcode table
                 $qrcode = new Qr(); 
