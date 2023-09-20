@@ -68,6 +68,10 @@ class ResidentController extends Controller
                 $resident->email = $residentData['email'];
                 $resident->created_by = $createdByUserId;
                 $resident->user_id = $createdByUserId;
+                
+                // Generate a random color and assign it to the color_name field
+                $resident->color_name = generateRandomColor();
+                
                 $resident->save();
 
                 // Generate a QR code
