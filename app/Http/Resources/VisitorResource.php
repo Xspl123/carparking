@@ -20,10 +20,9 @@ class VisitorResource extends JsonResource
             'visitor_type' => $this->visitor_type,
             'token_no' => $this->token_no,
             'vehicle_number' => $this->vehicle_number,
-            'check_in_time' => Carbon::parse($this->check_in_time)->format('d-M-Y H:i'), // Parse and format 
-            'check_out_time' => Carbon::parse($this->check_out_time)->format('d-M-Y H:i'),
+            'check_in_time' => $this->check_in_time,  
+            'check_out_time' => $this->check_out_time,
             'resident' => new ResidentResource($this->whenLoaded('resident')), // Include resident data
-
         ];
     }
 }

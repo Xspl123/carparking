@@ -9,6 +9,7 @@ class ManageVehicale extends Model
 {
     use HasFactory;
 
+    protected $fillable = ['status'];
 
     public function vehicle()
     {

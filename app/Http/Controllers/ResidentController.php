@@ -29,8 +29,53 @@ class ResidentController extends Controller
         ], 200);
     }
 
+    // public function searchResidents(Request $request)
+    // {
+    //     $perPage = 20; // Har page par dikhaye jane wale residents ki sankhya
 
-  
+    //     // Request se search query hasil karen
+    //     $searchQuery = $request->input('flat_number');
+
+    //     $query = Resident::with('vehicle')->latest();
+
+    //     // Agar search query pradan ki gayi hai, to residents ko search criteria ke adhar par filter karen
+    //     if (!empty($searchQuery)) {
+    //         $query->where('name', 'like', "%$searchQuery%");
+    //     }
+
+    //     $residents = $query->limit(50)->paginate($perPage);
+
+    //     return response()->json([
+    //         'residents' => $residents,
+    //     ], 200);
+    // }
+
+    public function searchResidents(Request $request)
+    {
+        $flat_number = $request->input('flat_number');
+
+        // Check if 'flat_number' input is empty
+        if (empty($flat_number)) {
+            return response()->json([
+                'message' => 'Please provide a valid flat number for the search.',
+            ], 400); // Return a 400 Bad Request status code for invalid input.
+        }
+
+        $results = Resident::where('flat_number', '=', $flat_number)->get();
+
+        // Check if no residents were found for the provided flat number
+        if ($results->isEmpty()) {
+            return response()->json([
+                'message' => 'No residents found for the provided flat number.',
+            ], 404); // Return a 404 status code to indicate not found.
+        }
+
+        return response()->json([
+            'results' => $results,
+        ], 200);
+    }
+
+    
     public function singleResident($id)
     {
         try {

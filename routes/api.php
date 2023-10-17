@@ -33,6 +33,7 @@ Route::middleware(['auth:sanctum', 'logApiRequests'])->group(function () {
     Route::post('/vehicles', [VehicleController::class,'store']);
     Route::put('/vehicles/{id}', [VehicleController::class,'update']);
     Route::delete('/vehicles/{id}', [VehicleController::class,'delete']);
+    Route::post('showDataBehalfOfVehicaleNo',[VehicleController::class,'showDataBehalfOfVehicaleNo']);
     //VehicleInsController
     Route::post('/vehicles-in', [VehicleInsController::class, 'store']);
     Route::put('/vehicles/{id}', [VehicleInsController::class,'update']);
@@ -41,14 +42,14 @@ Route::middleware(['auth:sanctum', 'logApiRequests'])->group(function () {
     //ManageVehicaleController
     Route::post('/manage-vehicles_in', [ManageVehicaleController::class, 'vehicleIn']);
     Route::get('/manage-vehicle-details', [ManageVehicaleController::class, 'showVehiclesStatus']);
-    Route::get('/manage-singleVehicaleStatus/{id}', [ManageVehicaleController::class,'singleVehiclesStatus']);
+    Route::get('/manage-singleVehicaleStatus/{vehicleId}', [ManageVehicaleController::class,'getVehicleEntryExitDetails']);
     //VehicleInsController
     Route::post('/vehicles-out', [VehicleOutController::class, 'store']);
     //ResidentController
     Route::post('/add-resident', [ResidentController::class, 'store']);
     Route::get('/resident-with-vehicles', [ResidentController::class,'index']);
     Route::get('/singleResident/{id}', [ResidentController::class,'singleResident']);
-
+    Route::get('/residents/search', [ResidentController::class,'searchResidents']);
    //QrCodeController
    Route::get('/getqrdetails', [QrCodeController::class,'show']);
    Route::get('/checkVehicaldata/{uuid}', [QrCodeController::class,'getVehicleData']);

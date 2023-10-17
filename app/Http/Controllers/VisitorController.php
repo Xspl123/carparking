@@ -24,12 +24,13 @@ class VisitorController extends Controller
 
             $visitor->save();
 
-        return response()->json(['message' => 'Visitor added successfully'], 201);
+        return response()->json(['message' => 'Visitor added successfully','token' => $visitor->token_no], 201);
     }
 
     public function showVisitor(){
-
-        $visitors = Visitor::latest()->with('resident')->get();
+        $perPage = 10; // Number of residents per page
+        $visitors = Visitor::latest()->with('resident')->limit(50) // Limit the total number of residents to 50
+        ->paginate($perPage);
         return VisitorResource::collection($visitors);
     }
 

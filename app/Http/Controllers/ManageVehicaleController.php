@@ -4,12 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Models\ManageVehicale;
 use App\Models\vehicle;
+use App\Models\VehicaleHistory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 
 class ManageVehicaleController extends Controller
 {
+
     public function vehicleIn(Request $request)
     {
         // Validate the request data, e.g., check if 'vehicle_id' and resident_id and'status' are provided
@@ -32,17 +34,24 @@ class ManageVehicaleController extends Controller
         // Convert the input status to lowercase
         $status = strtolower($request->input('status'));
     
-        // Create a new ManageVehicle instance and fill its attributes
-        $vehicle = new ManageVehicale();
-        $vehicle->vehicle_id = $request->input('vehicle_id');
-        $vehicle->resident_id = $request->input('resident_id');
-        $vehicle->status = $status;
-        $vehicle->user_id = $userId;
-        $vehicle->save();
-    
-        $message = $status === 'in' ? 'Vehicle In Entry Added Successfully' : 'Vehicle Out Entry Added Successfully';
-    
-        return response()->json(['message' => $message]);
+            // Create a new ManageVehicle instance and fill its attributes
+            $vehicle = new ManageVehicale();
+            $vehicle->vehicle_id = $request->input('vehicle_id');
+            $vehicle->resident_id = $request->input('resident_id');
+            $vehicle->status = $status;
+            $vehicle->user_id = $userId;
+            $vehicle->save();
+
+            // Create a new entry in the vehicle_histories table
+            $history = new VehicaleHistory();
+            $history->vehicle_id = $request->input('vehicle_id');
+            $history->status = $status;
+            
+            $history->save();
+
+            $message = $status === 'In' ? 'Vehicle In Entry Added Successfully' : 'Vehicle Out Entry Added Successfully';
+
+            return response()->json(['message' => $message]);
     }
 
     public function showVehiclesStatus()
@@ -55,13 +64,16 @@ class ManageVehicaleController extends Controller
     }
 
 
-    public function singleVehiclesStatus($id)
+    public function getVehicleEntryExitDetails($vehicleId)
     {
         try {
-            $vehicle = ManageVehicale::with('vehicle:id,vehicle_name,plat_number,parking_number,registration_number','resident:id,name,flat_number')->findOrFail($id);
-            return response()->json(['data' => $vehicle], 200);
-        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            $entryExitRecords = ManageVehicale::where('vehicle_id', $vehicleId)
+                ->orderBy('created_at', 'asc')
+                ->get();
+
+            return response()->json(['data' => $entryExitRecords], 200);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'An error occurred'], 500);
         }
     }
-
 }

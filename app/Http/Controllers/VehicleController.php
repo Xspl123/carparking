@@ -14,14 +14,38 @@ class VehicleController extends Controller
 {
     public function show()
     {
-        $vehicles = Vehicle::all();
+            $perPage = 10; // Number of residents per page
+            $vehicles = Vehicle::with('resident')
+           
+            ->limit(50) // Limit the total number of residents to 50
+            ->paginate($perPage);
 
         if ($vehicles->isEmpty()) {
             return response()->json(['message' => 'No vehicles found'], 404);
         }
 
-        return response()->json(['data' => $vehicles], 200);
+        return response()->json(['Result' => $vehicles], 200);
     }
+
+    public function showDataBehalfOfVehicaleNo(Request $request)
+    {
+        $plateNumber = $request->input('plat_number');
+
+        if (!$plateNumber) {
+            return response()->json(['message' => 'Plate number is required'], 400);
+        }
+
+        $vehicle = Vehicle::with('resident')
+            ->where('plat_number', $plateNumber)
+            ->first();
+
+        if (!$vehicle) {
+            return response()->json(['message' => 'Vehicle not found'], 404);
+        }
+
+        return response()->json(['Result' => $vehicle], 200);
+    }
+
 
     
     public function single($id)

@@ -18,6 +18,7 @@ class ResidentRequest extends FormRequest
             'flat_number' => 'required|string|max:255',
             'phone' => 'required',
             'email' => 'nullable|email|max:255',
+            'another_phone' => 'nullable'
         ];
     }
 }
